@@ -622,10 +622,17 @@ test_eval_classifier(eval_classifier,perceptron)
 
 
 def eval_learning_alg(learner, data_gen, n_train, n_test, it):
-    pass
+    accuracy_sum = 0
+    for iteration in range(it):
+        data_train, labels_train = data_gen(n_train)
+        data_test, labels_test = data_gen(n_test)
+        accuracy_sum += eval_classifier(learner, data_train, labels_train, data_test, labels_test)
+    return accuracy_sum / it
 
 #Test cases:
-#test_eval_learning_alg(eval_learning_alg,perceptron)
+test_eval_learning_alg(eval_learning_alg,perceptron)
+
+
 
 
 def xval_learning_alg(learner, data, labels, k):
