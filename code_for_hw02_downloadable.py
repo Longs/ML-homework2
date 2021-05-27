@@ -522,8 +522,8 @@ def perceptron(data,labels, params={}, hook=None):
         new_row.append(1)
 
     new_row = np.array(new_row, ndmin=2)
-    print(f"data: {data}")
-    print(f"new_row {new_row}")
+    #print(f"data: {data}")
+    #print(f"new_row {new_row}")
     new_data=np.concatenate((data,new_row),axis=0)
 
     
@@ -608,8 +608,8 @@ test_averaged_perceptron(averaged_perceptron)
 
 def eval_classifier(learner, data_train, labels_train, data_test, labels_test):
     th,th0 = learner(data_train,labels_train,{})
-    print(f"th: \n{th}")
-    print(f"data_test: \n {data_test}")
+    #print(f"th: \n{th}")
+    #print(f"data_test: \n {data_test}")
 
     results = np.dot(data_test.T,th)
     results += th0
@@ -636,10 +636,36 @@ test_eval_learning_alg(eval_learning_alg,perceptron)
 
 
 def xval_learning_alg(learner, data, labels, k):
-    pass
+    #'leave one out' cross validation
+    accuracy_sum = 0
+    data_segment = np.hsplit(data,k)
+    labels_segment = np.hsplit(labels,k)
+    for exclude in range(k):
+        data_test = np.copy(data_segment[exclude])
+        labels_test = np.copy(labels_segment[exclude])
+        data_train = 0
+        labels_train = 0
+        #print(f"type of data_train: {type(data_train)}")
+
+        for include in range(k):
+            if include == exclude:
+                pass
+            else:
+                if type(data_train) is int:
+                    data_train = np.copy(data_segment[include])
+                    print(f"type of data_train: {type(data_train)}")
+                    labels_train = np.copy(labels_segment[include])
+                else:
+                    data_train = np.concatenate((data_train,data_segment[include]),axis=1)
+                    labels_train = np.concatenate((labels_train,labels_segment[include]),axis=1)
+        accuracy_sum += eval_classifier(learner, data_train, labels_train, data_test, labels_test)
+    return accuracy_sum / k
+
+
+
 
 #Test cases:
-#test_xval_learning_alg(xval_learning_alg,perceptron)
+test_xval_learning_alg(xval_learning_alg,perceptron)
 
 
 #For problem 10, here is an example of how to use gen_flipped_lin_separable, in this case with a flip probability of 50%
