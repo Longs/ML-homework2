@@ -527,12 +527,12 @@ def perceptron(data,labels, params={}, hook=None):
     new_data=np.concatenate((data,new_row),axis=0)
 
     
-    print(f"new_data: {new_data}")
-    print(f"labels: {labels}")
+    #print(f"new_data: {new_data}")
+    #print(f"labels: {labels}")
     #print(f"")
 
     origin_answer = perceptron_origin(new_data,labels,T)
-    print(f"origin_answer {origin_answer}")
+    #print(f"origin_answer {origin_answer}")
     if origin_answer is None:
         return np.array([[1,1]]), np.array([[1]])
     else: 
@@ -632,7 +632,15 @@ def eval_learning_alg(learner, data_gen, n_train, n_test, it):
 #Test cases:
 test_eval_learning_alg(eval_learning_alg,perceptron)
 
-
+def eval_learning_alg_no_test(learner, data_gen, n_train, n_test, it):
+    accuracy_sum = 0
+    for iteration in range(it):
+        data_train, labels_train = data_gen(n_train)
+        #data_test, labels_test = data_gen(n_test)
+        data_test = data_train
+        labels_test = labels_train
+        accuracy_sum += eval_classifier(learner, data_train, labels_train, data_test, labels_test)
+    return accuracy_sum / it
 
 
 def xval_learning_alg(learner, data, labels, k):
@@ -653,7 +661,7 @@ def xval_learning_alg(learner, data, labels, k):
             else:
                 if type(data_train) is int:
                     data_train = np.copy(data_segment[include])
-                    print(f"type of data_train: {type(data_train)}")
+                    #print(f"type of data_train: {type(data_train)}")
                     labels_train = np.copy(labels_segment[include])
                 else:
                     data_train = np.concatenate((data_train,data_segment[include]),axis=1)
@@ -663,11 +671,69 @@ def xval_learning_alg(learner, data, labels, k):
 
 
 
+def xval_wrapper(learner, data_gen, data_size, k, it):
+    accuracy_sum = 0
+    for iteration in range(it):
+        data, labels = data_gen(data_size)
+        accuracy_sum+= xval_learning_alg(learner, data, labels, k)
+    return accuracy_sum/it
+
+
 
 #Test cases:
 test_xval_learning_alg(xval_learning_alg,perceptron)
 
 
 #For problem 10, here is an example of how to use gen_flipped_lin_separable, in this case with a flip probability of 50%
-#print(eval_learning_alg(perceptron, gen_flipped_lin_separable(pflip=.5), 20, 20, 5))
+it=1000
 
+print(f"\n From test and train ({it} iterations:\n")
+
+p=0.1
+print(f"p = {p} test train perceptron: {eval_learning_alg(perceptron, gen_flipped_lin_separable(pflip=p), 20, 20, it)}")
+print(f"p = {p} test train averaged perceptron: {eval_learning_alg(averaged_perceptron, gen_flipped_lin_separable(pflip=p), 20, 20, it)}")
+p=0.25
+print(f"p = {p} test train perceptron: {eval_learning_alg(perceptron, gen_flipped_lin_separable(pflip=p), 20, 20, it)}")
+print(f"p = {p} test train averaged perceptron: {eval_learning_alg(averaged_perceptron, gen_flipped_lin_separable(pflip=p), 20, 20, it)}")
+
+print(f"\n From train no test ({it} iterations:\n")
+
+p=0.1
+print(f"p = {p} test train perceptron: {eval_learning_alg_no_test(perceptron, gen_flipped_lin_separable(pflip=p), 20, 20, it)}")
+print(f"p = {p} test train averaged perceptron: {eval_learning_alg_no_test(averaged_perceptron, gen_flipped_lin_separable(pflip=p), 20, 20, it)}")
+p=0.25
+print(f"p = {p} test train perceptron: {eval_learning_alg_no_test(perceptron, gen_flipped_lin_separable(pflip=p), 20, 20, it)}")
+print(f"p = {p} test train averaged perceptron: {eval_learning_alg_no_test(averaged_perceptron, gen_flipped_lin_separable(pflip=p), 20, 20, it)}")
+
+print(f"\n From leave one out ({it} iterations:\n")
+
+p=0.1
+print(f"p = {p} test train perceptron: {eval_learning_alg(perceptron, gen_flipped_lin_separable(pflip=p), 20, 20, it)}")
+print(f"p = {p} test train averaged perceptron: {eval_learning_alg(averaged_perceptron, gen_flipped_lin_separable(pflip=p), 20, 20, it)}")
+p=0.25
+print(f"p = {p} test train perceptron: {eval_learning_alg(perceptron, gen_flipped_lin_separable(pflip=p), 20, 20, it)}")
+print(f"p = {p} test train averaged perceptron: {eval_learning_alg(averaged_perceptron, gen_flipped_lin_separable(pflip=p), 20, 20, it)}")
+
+p=0.1
+print(f"p = {p} test train perceptron: {xval_wrapper(perceptron, gen_flipped_lin_separable(pflip=p), 20, 5, it)}")
+print(f"p = {p} test train averaged perceptron: {xval_wrapper(averaged_perceptron, gen_flipped_lin_separable(pflip=p), 20, 5, it)}")
+
+p=0.25
+print(f"p = {p} test train perceptron: {xval_wrapper(perceptron, gen_flipped_lin_separable(pflip=p), 20, 5, it)}")
+print(f"p = {p} test train averaged perceptron: {xval_wrapper(averaged_perceptron, gen_flipped_lin_separable(pflip=p), 20, 5, it)}")
+
+"""
+ From test and train (1000 iterations:
+
+p = 0.1 test train perceptron: 0.7568499999999989
+p = 0.1 test train averaged perceptron: 0.8072
+p = 0.25 test train perceptron: 0.5898500000000003
+p = 0.25 test train averaged perceptron: 0.6288499999999998
+
+ From leave one out (1000 iterations:
+
+p = 0.1 test train perceptron: 0.7508500000000005
+p = 0.1 test train averaged perceptron: 0.7905999999999996
+p = 0.25 test train perceptron: 0.5953
+p = 0.25 test train averaged perceptron: 0.6319500000000001
+"""
