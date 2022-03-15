@@ -497,9 +497,14 @@ def perceptron_origin(data,labels,T):
     data_t = data.T
     #print(f"data: {data}")
     #print(f"data_T: {data_t}")
+
+    #adding printed count of mistakes for homework 3
+    mistakes = 0
+
     while changed !=False:
         changed = False
         if iteration == T: 
+            print(f"mistakes: {mistakes}")
             return answer # - there is no right answer but this will do...
         for i in range (len(data[0])):
             #print(np.sign(np.dot(answer,data[i])))
@@ -507,9 +512,26 @@ def perceptron_origin(data,labels,T):
             if np.sign(np.dot(answer,data_t[i])) != np.sign(labels[0][i]):
                 answer = answer + labels[0][i]*data_t[i]
                 changed = True
+                mistakes +=1
         iteration += 1
 
+    print(f"mistakes: {mistakes}")
     return answer
+
+h3_data=np.array([[200,800,200,800],[0.2,0.2,0.8,0.8],[1,1,1,1]])
+h3_labels = np.array([[-1,-1,1,1]])
+
+print(f"***************** h3 original:*************** ")
+print(f"h3_data = {h3_data}")
+print(f"answer: {perceptron_origin(h3_data,h3_labels,-1)}")
+
+for _ in range (len(h3_data[0])):
+    h3_data[0,_] = h3_data[0,_] * 0.001
+
+print(f"***************** h3 MODIFIED:*************** ")
+print(f"h3_data = {h3_data}")
+print(f"answer: {perceptron_origin(h3_data,h3_labels,-1)}")
+
 
 def perceptron(data,labels, params={}, hook=None):
 
@@ -544,6 +566,27 @@ for datafn in (super_simple_separable_through_origin,super_simple_separable):
    data, labels = datafn()
    test_linear_classifier(datafn,perceptron,draw=True)
 '''
+
+print(f"&&&&&&&&&&&&&& homework 3 q 2 &&&&&&&&&&&&&&&&")
+h3_data=np.array([[2,3,4,5]])
+h3_labels = np.array([[1,1,-1,-1]])
+
+print(f"answer: {perceptron(h3_data,h3_labels)}")
+
+def one_hot(x, k):
+    out = np.zeros((k,1))
+    out[x-1][0]=1
+    return out
+
+print(f"&&&&&&&&&&&&&& homework 3 q 3 &&&&&&&&&&&&&&&&")
+
+new_h3_data=[]
+for _ in h3_data[0]:
+    new_h3_data.append (one_hot(_,6))
+
+print(f"data: {new_h3_data}")
+print(f"answer: {perceptron(new_h3_data,h3_labels)}")
+
 
 #Test Cases:
 test_perceptron(perceptron)
@@ -687,6 +730,9 @@ test_xval_learning_alg(xval_learning_alg,perceptron)
 #For problem 10, here is an example of how to use gen_flipped_lin_separable, in this case with a flip probability of 50%
 it=1000
 
+#homework3 commenting out following homework2 to save time
+
+"""
 print(f"\n From test and train ({it} iterations:\n")
 
 p=0.1
@@ -721,7 +767,9 @@ print(f"p = {p} test train averaged perceptron: {xval_wrapper(averaged_perceptro
 p=0.25
 print(f"p = {p} test train perceptron: {xval_wrapper(perceptron, gen_flipped_lin_separable(pflip=p), 20, 5, it)}")
 print(f"p = {p} test train averaged perceptron: {xval_wrapper(averaged_perceptron, gen_flipped_lin_separable(pflip=p), 20, 5, it)}")
+"""
 
+ 
 """
  From test and train (1000 iterations:
 
